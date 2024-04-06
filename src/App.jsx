@@ -1,5 +1,5 @@
 //Importing the hooks here
-import { useState, useCallback, useEffect } from 'react'
+import { useState, useCallback, useEffect, useRef } from 'react'
 
 function App() {
   //dependecies and constants
@@ -8,7 +8,10 @@ function App() {
   const [charAllowed, setCharAllowed] = useState(false);
   const [password, setPassword] = useState("");
 
-  //Method for generating the password
+  //useRef Hook which is used for the copy button.
+  const passwordRef = useRef(null);
+
+  //Method for generating the password.
   const passwordGenerator = useCallback(() => {
     let pass = ""
     let str = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
@@ -25,6 +28,13 @@ function App() {
 
   }, [length, numberAllowed, charAllowed, setPassword]);
 
+  //onClick method for the button to copy the password to the clipboard.
+  const copyPasswordToClipbboard = useCallback(() => {
+    passwordRef.current?.select()
+    window.navigator.clipboard.writeText(password)
+  }, [password])
+
+  //This hook is running the passwordGenerator method whenever slider, number or characters are changed.
   useEffect(() => {
     passwordGenerator()
   }, [length, numberAllowed, charAllowed, passwordGenerator])
@@ -32,12 +42,12 @@ function App() {
   return (
     <>
       {/* Heading */}
-      <h1 className="text-3xl font-bold text-center text-white mt-20">
+      <h1 className="text-4xl text-center text-white mt-20 font-mono font-bold tracking-wider">
       PASSWORD GENERATOR
       </h1>
 
       {/* Main Container */}
-      <div className="w-full p-5 max-w-md mx-auto shadow-md my-8 text-orange-500 bg-slate-800 rounded-lg text-center">
+      <div className="w-full p-5 max-w-md mx-auto shadow-md my-6 text-pink-500 bg-slate-800 rounded-lg text-center">
         
         {/* Password Field */}
         <div className='flex'>
@@ -47,23 +57,25 @@ function App() {
         className='outline-none w-full py-1 px-3 rounded-lg'
         placeholder='Password'
         readOnly
+        ref={passwordRef}
         />
 
         {/* Copy Password Button */}
         <button
-        className='outline-none bg-blue-700 text-white rounded-lg px-3 py-0.5 shrink-0 ml-2'
+        onClick={copyPasswordToClipbboard}
+        className='outline-none text-white bg-blue-700 hover:bg-blue-400 rounded-lg px-3 py-0.5 shrink-0 ml-2'
         >Copy</button>
         </div>
         
         {/* Slider, Numbers & Characters Checkbox */}
-        <div className='flex text-sm mt-3 gap-x-2 justify-between'>
+        <div className='flex font-mono font-semibold text-sm mt-3 gap-x-2 justify-between'>
 
           {/* Slider */}
           <div className='flex items-center gap-x-1'>
             <input
             type='range'
             min={5}
-            max={10}
+            max={15}
             value={length}
             className='cursor-pointer'
             onChange={(e) => {setLength(e.target.value)}}
